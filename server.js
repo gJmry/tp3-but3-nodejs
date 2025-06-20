@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import { app } from './app.js'
 
-const connectString ="mongodb+srv://titouanandre38:mCJkui9xgDVgIA5F@clusternode.scblgod.mongodb.net/natours?retryWrites=true&w=majority&appName=ClusterNode"
+const connectString ="YOURCLUSTERURLHERE"
 
 async function connectDB() {
     await mongoose.connect(connectString)
