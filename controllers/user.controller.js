@@ -5,7 +5,7 @@ import User from '../models/user.model.js';
 
 const getAllUsers = async (req, res) => {
     try {
-        const users = await User.find().select('-password'); // Exclure le mot de passe
+        const users = await User.find().select('-password');
         res.status(200).json({
             status: 'success',
             data: users
@@ -22,7 +22,7 @@ const createUser = async (req, res) => {
     try {
         const { name, email, password, role } = req.body;
 
-        // Vérifier si l'utilisateur existe déjà
+
         const existingUser = await User.findOne({ email });
         if (existingUser) {
             return res.status(400).json({
@@ -31,7 +31,7 @@ const createUser = async (req, res) => {
             });
         }
 
-        // Seul un admin peut créer un autre admin
+
         if (role === 'admin' && req.user.role !== 'admin') {
             return res.status(403).json({
                 status: 'error',
@@ -49,7 +49,7 @@ const createUser = async (req, res) => {
 
         await user.save();
 
-        // Retourner l'utilisateur sans le mot de passe
+
         const userResponse = user.toObject();
         delete userResponse.password;
 
@@ -94,7 +94,7 @@ const updateUser = async (req, res) => {
         const { name, email, password, role } = req.body;
         const userId = req.params.id;
 
-        // Seul un admin peut modifier le rôle
+
         if (role && req.user.role !== 'admin') {
             return res.status(403).json({
                 status: 'error',
@@ -102,13 +102,12 @@ const updateUser = async (req, res) => {
             });
         }
 
-        // Préparer les données à mettre à jour
+
         const updateData = {};
         if (name) updateData.name = name;
         if (email) updateData.email = email;
         if (role) updateData.role = role;
 
-        // Si un nouveau mot de passe est fourni, le hasher
         if (password) {
             updateData.password = await bcrypt.hash(password, 10);
         }
@@ -166,7 +165,6 @@ const signup = async (req, res) => {
     try {
         const { name, email, password, role } = req.body;
 
-        // Validation des champs requis
         if (!name || !email || !password) {
             return res.status(400).json({
                 status: 'error',
@@ -174,7 +172,6 @@ const signup = async (req, res) => {
             });
         }
 
-        // Vérifier si l'utilisateur existe déjà
         const existingUser = await User.findOne({ email });
         if (existingUser) {
             return res.status(400).json({
@@ -183,8 +180,6 @@ const signup = async (req, res) => {
             });
         }
 
-        // Pour l'inscription publique, seul le rôle 'user' est autorisé
-        // Les admins peuvent créer d'autres rôles via createUser
         const userRole = role && req.user ? role : 'user';
 
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -221,7 +216,6 @@ const login = async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        // Validation des champs requis
         if (!email || !password) {
             return res.status(400).json({
                 status: 'error',
